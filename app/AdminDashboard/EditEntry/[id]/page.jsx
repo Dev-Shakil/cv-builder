@@ -26,7 +26,7 @@
     
   
 //   return (
-// <div className="min-w-screen min-h-screen bg-gray-100 flex flex-col items-center justify-center">
+//     <div className="min-w-screen min-h-screen bg-gray-100 flex flex-col items-center justify-center">
 //         <div className="w-5/6 rounded-xl bg-gray-800 shadow-lg mr-3">
 //             <div className="flex flex-col">
 //                 <div id="header" className="flex flex-col items-center justify-center text-white py-4 bg-blue-800">
@@ -36,10 +36,9 @@
 
 //                 <div className="px-4">
 //                 <EditForm id={id} Passenger={passenger} />
-// </div>
+//             </div>
 //             </div>
 //         </div>
-       
 //     </div>
 //   )
 // }
