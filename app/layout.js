@@ -1,6 +1,8 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import UserLayout from "./UserDashboard/layout";
+import PathnameProvider from "./components/PathnameProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -19,13 +21,18 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+
+  // if (pathname.startsWith("/UserDashboard")) {
+  //   return <UserLayout>{children}</UserLayout>;
+  // }
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         cz-shortcut-listen="true"
-      >
+      ><PathnameProvider>
         {children}
+        </PathnameProvider>
         <Toaster />
       </body>
     </html>

@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { FaFileDownload } from "react-icons/fa";
 import { updateUserStatus } from "@/lib/actions";
+import Hellow from "./hellow";
 
 function formatDate(dateString) {
   if (!dateString) return "";
@@ -25,7 +26,7 @@ const User_Table = ({ resume }) => {
     { value: "Approved", label: "Approved" },
     { value: "Rejected", label: "Rejected" },
   ];
-
+  console.log(resume)
   // Helper function to update status with server action
   async function handleStatusUpdate(id, newStatus,office, setLoading) {
     try {
@@ -45,14 +46,14 @@ const User_Table = ({ resume }) => {
     {
       name: <p className="font-bold text-lg">Name</p>,
       selector: (row) => (
-        <div className="flex flex-col">
-          <h3 className="font-bold text-md uppercase">{row.name}</h3>
+        <div className="flex flex-col space-y-2">
+          <h3 className="font-medium text-green-600 text-lg uppercase">{row.name}</h3>
           <p className="font-semibold">Passport: {row.passport_no}</p>
           <p>Date of Birth: {row.dob}</p>
-          <p>Nationality: {row.nationality}</p>
         </div>
       ),
       wrap: true,
+      minWidth:"250px"
     },
     {
       name: <p className="font-bold text-lg">Position</p>,
@@ -81,45 +82,37 @@ const User_Table = ({ resume }) => {
     },
     {
       name: <p className="font-bold text-lg">Picture</p>,
-      selector: (row) => (
-        <Image
-          src={row.picture}
-          alt={row.name}
-          width={100}
-          height={100}
-          className="h-16 w-16 rounded object-cover"
-        />
-      ),
+      selector: (row) =>
+        row?.picture ? (
+          <Image
+            src={row.picture}
+            alt={row.name}
+            width={100}
+            height={100}
+            className="h-16 w-16 rounded object-cover"
+          />
+        ) : (
+          <p className="text-gray-500">No Image</p> // Placeholder text when empty
+        ),
       wrap: true,
     },
     {
       name: <p className="font-bold text-lg">Passport Image</p>,
-      selector: (row) => (
-        <Image
-          src={row.passport_image}
-          alt={`Passport of ${row.name}`}
-          width={100}
-          height={100}
-          className="h-16 w-16 rounded object-cover"
-        />
-      ),
+      selector: (row) =>
+        row?.passport_image ? (
+          <Image
+            src={row.passport_image}
+            alt={`Passport of ${row?.name}`}
+            width={100}
+            height={100}
+            className="h-16 w-16 rounded object-cover"
+          />
+        ) : (
+          <p className="text-gray-500">No Passport Image</p> // Placeholder text
+        ),
       wrap: true,
     },
-    {
-      name: <p className="font-bold text-lg">Height</p>,
-      selector: (row) => `${row.height} cm`,
-      wrap: true,
-    },
-    {
-      name: <p className="font-bold text-lg">Weight</p>,
-      selector: (row) => `${row.weight} kg`,
-      wrap: true,
-    },
-    {
-      name: <p className="font-bold text-lg">Number of Kids</p>,
-      selector: (row) => row.no_of_kids,
-      wrap: true,
-    },
+   
     {
       name: <p className="font-bold text-lg">Experience</p>,
       selector: (row) => row.experience,
@@ -137,29 +130,85 @@ const User_Table = ({ resume }) => {
     },
     {
       name: <p className="font-bold text-lg">Status</p>,
-      selector: (row) => (
-        <div>
-          <select
-            value={row?.status}
-            onChange={(e) => handleStatusUpdate(row._id, e.target.value,user.office_name, setLoading)}
-            className="border-2 rounded-md p-2 w-full"
-          >
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          {loading && <p className="text-sm text-gray-500 mt-1">Updating...</p>}
-        </div>
-      ),
+      // selector: (row) => {
+      //   // Check if the resume is approved by the current user's office
+      //   if (row?.approved_office === user?.office_name) {
+      //     if (row?.status === "Approved") {
+      //       // If the status is approved by the same office
+      //       return <p className="text-sm text-green-500">Approved</p>;
+      //     }
+      //   }
+    
+      //   // Check if the resume is approved by a different office
+      //   if (row?.approved_office !== user?.office_name && row?.approved_office) {
+      //     return <p className="text-sm text-gray-500">Not Available</p>;
+      //   }
+    
+      //   // If the resume is not approved by any office (status is "Pending")
+      //   return (
+      //     <div>
+      //       <select
+      //         value={row?.status}
+      //         onChange={(e) => handleStatusUpdate(row._id, e.target.value, user.office_name, setLoading)}
+      //         className="border-2 rounded-md p-2 w-full"
+      //       >
+      //         {options.map((option) => (
+      //           <option key={option.value} value={option.value}>
+      //             {option.label}
+      //           </option>
+      //         ))}
+      //       </select>
+      //       {loading && <p className="text-sm text-gray-500 mt-1">Updating...</p>}
+      //     </div>
+      //   );
+      // },
+      selector: (row) => {
+        // Check if the resume is approved by the current user's office
+        if (row?.approved_office?.includes(user?.office_name)) {
+          if (row?.status === "Approved") {
+            // If the status is approved by the same office
+            return <p className="text-sm text-green-500">Approved</p>;
+          }
+        }
+        
+        // If the resume is approved by a different office (not the current user's office)
+        if (row?.approved_office && !row?.approved_office.includes(user?.office_name)) {
+          return <p className="text-sm text-gray-500">Not Available</p>;
+        }
+        
+        // If the resume is not approved by any office (status is "Pending")
+        return (
+          <div>
+            <select
+              value={row?.status}
+              onChange={(e) => handleStatusUpdate(row._id, e.target.value, user.office_name, setLoading)}
+              className="border-2 rounded-md p-2 w-full"
+            >
+              {options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {loading && <p className="text-sm text-gray-500 mt-1">Updating...</p>}
+          </div>
+        );
+      },
       wrap: true,
-      minWidth: "200px",
+      minWidth: "150px",
     },
     {
       name: <p className="font-bold text-lg">Entry Date</p>,
       selector: (row) => formatDate(row.createdAt),
       wrap: true,
+    },
+    {
+      name: <p className="font-bold text-lg">Print</p>,
+      selector: (row) => (
+        <Link className="" href={`/UserDashboard/cv/${row?._id}`}><button className="bg-green-600 px-6 py-2 rounded-lg text-white">Print CV</button></Link>
+      ),
+      wrap: true,
+      minWidth: "150px",
     },
   ];
 
@@ -192,12 +241,7 @@ const User_Table = ({ resume }) => {
       !(pax.status === "Approved" && pax.approved_office !== user?.office_name) // Exclude "Approved" items if approved_office doesn't match
     );
   });
-  const HandleLogout = () => {
-    typeof window !== "undefined"
-      ? window.localStorage.removeItem("user")
-      : false;
-    router.push("/");
-  };
+  
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState([]);
@@ -234,20 +278,7 @@ const User_Table = ({ resume }) => {
 
   return (
     <>
-      <nav className="flex items-center top-0 sticky w-full justify-between bg-teal-500 py-3 px-6">
-        <p className="flex items-center flex-shrink-0 text-white mr-6 hover:text-pink-800 text-xl cursor-pointer">
-          {user?.office_name?.toUpperCase()}
-        </p>
-
-        <div className="flex gap-3">
-          <button
-            onClick={HandleLogout}
-            className="inline-block text-md px-4 py-3 leading-none border rounded text-white border-white hover:border-transparent font-bold hover:text-teal-500 hover:bg-black lg:mt-0"
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
+      
       <p className="p-5 text-xl font-bold">Total : {singleUsersData.length}</p>
       <DataTable
         columns={columns}
@@ -267,6 +298,7 @@ const User_Table = ({ resume }) => {
           </div>
         }
       />
+      
     </>
   );
 };

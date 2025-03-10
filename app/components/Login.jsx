@@ -26,7 +26,7 @@ const Login = () => {
         localStorage.setItem("user", JSON.stringify(response.user));
       alert("Successfully Logged In!");
     
-      if (response.user.role === "admin") {
+      if (response.user.role === "admin" ) {
         router.push("/AdminDashboard");
       } else {
         router.push("/UserDashboard");

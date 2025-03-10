@@ -4,56 +4,51 @@ import { redirect, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
 import DataTable from 'react-data-table-component';
-import { MdDelete, MdEditDocument } from 'react-icons/md';
-import { FaFileDownload } from "react-icons/fa";
+import { MdDelete, MdEditDocument, MdOutlineLocalPrintshop } from 'react-icons/md';
+import { FaFileDownload, FaPrint } from "react-icons/fa";
 import TextInput from './TextInput';
 import Image from 'next/image';
+import { deleteResume } from '@/lib/actions';
 
 const Admin_Table = ({passenger}) => {
     const router = useRouter()
     const [search, setSearch]= useState('');
     const [users, setUsers] = useState([]);
     const [filter, setFilter]= useState([]);
-    const [pass, setPass]= useState({
-        name:"",
-        mofa:"",
-        medical:"",
-        visa_no:"",
-        bio_finger:"",
-        bmet_finger:"",
-        training:"",
-        delivery:"",
-        manpower:"",
-
-    });
+    
     
     const user =  typeof window !== "undefined" ? JSON.parse(window.localStorage.getItem('user')) : false;
-    console.log(user.role)
+    
     useEffect(()=>{
         if(!user || user.role!=='admin'){
             redirect("/")
         }
     },[]);
-    const HandleRemove = async (id)=>{
-        try {
-            const res = await fetch(`/api/passenger/${id}`, {
-              method: "DELETE",
-              headers: {
-                "Content-type": "application/json",
-              },
-              body: JSON.stringify({id}),
-            });
+    const HandleRemove = async (id) => {
+    
+      // Confirm deletion
+      const isConfirmed = window.confirm("Are you sure you want to delete this resume entry?");
       
-            if (res.ok) {
-              alert("Successfully Deleted Your User")
-              router.refresh();
-            } else {
-              throw new Error("Failed to Delete The User");
-            }
-          } catch (error) {
-            console.log(error);
-          }
-    }
+      if (!isConfirmed) {
+        console.log("Deletion cancelled by the user.");
+        return;  // Exit if user cancels the action
+      }
+    
+      try {
+        // Call the server-side delete function
+        const response = await deleteResume(id);
+    
+        if (response.ok) {
+          alert("Successfully deleted the resume entry");
+          router.redirect("/AdminDashboard");  // Refresh the page after successful deletion
+        } else {
+          throw new Error(response.message || "Failed to delete the resume entry");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while deleting the resume entry");
+      }
+    };
     function formatDate(dateString) {
         if (!dateString) return "";
         let date = new Date(dateString);
@@ -74,9 +69,10 @@ const Admin_Table = ({passenger}) => {
                       className="text-2xl text-red-800 font-bold cursor-pointer"
                       onClick={() => HandleRemove(row._id)}
                   />
+                  <Link  href={`AdminDashboard/cv/${row?._id}`}><MdOutlineLocalPrintshop className="text-2xl text-red-800 font-bold cursor-pointer" /></Link>
               </div>
           ),
-          maxwidth: "25px",
+          minWidth: "120px",
       },
       {
           name: <p className="font-bold text-lg">Name</p>,
@@ -117,31 +113,37 @@ const Admin_Table = ({passenger}) => {
           wrap: true,
       },
       {
-          name: <p className="font-bold text-lg">Picture</p>,
-          selector: row => (
-              <Image
+            name: <p className="font-bold text-lg">Picture</p>,
+            selector: (row) =>
+              row?.picture ? (
+                <Image
                   src={row.picture}
                   alt={row.name}
                   width={100}
                   height={100}
                   className="h-16 w-16 rounded object-cover"
-              />
-          ),
-          wrap: true,
-      },
-      {
-          name: <p className="font-bold text-lg">Passport Image</p>,
-          selector: row => (
-              <Image
+                />
+              ) : (
+                <p className="text-gray-500">No Image</p> // Placeholder text when empty
+              ),
+            wrap: true,
+          },
+          {
+            name: <p className="font-bold text-lg">Passport Image</p>,
+            selector: (row) =>
+              row?.passport_image ? (
+                <Image
                   src={row.passport_image}
-                  alt={`Passport of ${row.name}`}
+                  alt={`Passport of ${row?.name}`}
                   width={100}
                   height={100}
                   className="h-16 w-16 rounded object-cover"
-              />
-          ),
-          wrap: true,
-      },
+                />
+              ) : (
+                <p className="text-gray-500">No Passport Image</p> // Placeholder text
+              ),
+            wrap: true,
+          },
       {
           name: <p className="font-bold text-lg">Height</p>,
           selector: row => `${row.height} cm`,
@@ -229,79 +231,7 @@ const Admin_Table = ({passenger}) => {
       // Cleanup interval on component unmount
       return () => clearInterval(interval);
     }, []);
-    useEffect(() => {
-        let result = passenger;
     
-        if (pass.name) {
-          result = result.filter((item) =>
-            item.agent?.toLowerCase().includes(pass.name.toLowerCase())
-          );
-        }
-        
-        if (pass.medical) {
-          result = result.filter((item) =>
-            item.medical?.toLowerCase().includes(pass.medical.toLowerCase())
-          );
-        }
-        
-        if (pass.mofa) {
-          result = result.filter((item) =>
-            item.mofa?.toLowerCase().includes(pass.mofa.toLowerCase())
-          );
-        }
-        if (pass.bio_finger) {
-          result = result.filter((item) =>
-            item.bio_finger?.toLowerCase().includes(pass.bio_finger.toLowerCase())
-          );
-        }
-        if (pass.training) {
-          result = result.filter((item) =>
-            item.training?.toLowerCase().includes(pass.training.toLowerCase())
-          );
-        }
-        if (pass.visa_no) {
-          result = result.filter((item) =>
-            item.visa_no?.toLowerCase().includes(pass.visa_no.toLowerCase())
-          );
-        }
-        if (pass.bmet_finger) {
-          result = result.filter((item) =>
-            item.bmet_finger?.toLowerCase().includes(pass.bmet_finger.toLowerCase())
-          );
-        }
-        if (pass.manpower) {
-          result = result.filter((item) =>
-            item.manpower?.toLowerCase().includes(pass.manpower.toLowerCase())
-          );
-        }
-        if (pass.delivery) {
-          result = result.filter((item) =>
-            item.delivery?.toLowerCase().includes(pass.delivery.toLowerCase())
-          );
-        }
-    
-        setFilter(result);
-      }, [pass, passenger]);
-    const extractedData = filter.map((row) => ({
-        Name: row?.name,
-        Passport: row?.passport_no,
-        Gender: row?.gender,
-        Country: row?.country,
-        Medical: row?.medical,
-        Mofa: row?.mofa,
-        "Bio Finger": row?.bio_finger,
-        "Police Clearance": row?.pc_no,
-        "Visa No": row?.visa_no,
-        "ID No": row?.id_no,
-        "Visa Stamping Date": row?.visa_stamping_date,
-        "Training": row?.training,
-        "BMET Finger": row?.bmet_finger,
-        "Manpower": row?.manpower,
-        "Delivery": row?.delivery,
-        "Payment": row?.payment,
-        "Remark": row?.remark,
-    }))
-    console.log(pass)
   return (
     <>
     <div>

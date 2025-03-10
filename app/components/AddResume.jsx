@@ -25,6 +25,12 @@ const AddResume = ({offices}) => {
     social_status: "",
     picture: null,
     passport_image: null,
+    place_of_birth:"",
+    address:"",
+    education:"",
+    phone_number:"",
+    passport_issue_place:"",
+    passport_issue_date: "",
     passport_expire_date: "",
     height: "",
     weight: "",
@@ -53,6 +59,12 @@ const AddResume = ({offices}) => {
       formDataToSubmit.append("contract", formState.contract);
       formDataToSubmit.append("religion", formState.religion);
       formDataToSubmit.append("social_status", formState.social_status);
+      formDataToSubmit.append("place_of_birth", formState.place_of_birth);
+      formDataToSubmit.append("address", formState.address);
+      formDataToSubmit.append("education", formState.education);
+      formDataToSubmit.append("phone_number", formState.phone_number);
+      formDataToSubmit.append("passport_issue_place", formState.passport_issue_place);
+      formDataToSubmit.append("passport_issue_date", formState.passport_issue_date);
       formDataToSubmit.append("passport_expire_date", formState.passport_expire_date);
       formDataToSubmit.append("height", formState.height);
       formDataToSubmit.append("weight", formState.weight);
@@ -86,6 +98,12 @@ const AddResume = ({offices}) => {
         social_status: "",
         picture: null,
         passport_image: null,
+        place_of_birth:"",
+        address:"",
+        education:"",
+        phone_number:"",
+        passport_issue_place:"",
+        passport_issue_date: "",
         passport_expire_date: "",
         height: "",
         weight: "",
@@ -177,6 +195,12 @@ const AddResume = ({offices}) => {
           { label: "Contract", name: "contract", type: "text" },
           { label: "Religion", name: "religion", type: "text" },
           { label: "Social Status", name: "social_status", type: "text" },
+          { label: "Place Of Birth", name: "place_of_birth", type: "text" },
+          { label: "Address", name: "address", type: "text" },
+          { label: "Education", name: "education", type: "text" },
+          { label: "Phone Number", name: "phone_number", type: "text" },
+          { label: "Passport Issue Date", name: "passport_issue_date", type: "date" },
+          { label: "Passport Issue Place", name: "passport_issue_place", type: "text" },
           { label: "Passport Expiry Date", name: "passport_expire_date", type: "date" },
           { label: "Height", name: "height", type: "number" },
           { label: "Weight", name: "weight", type: "number" },

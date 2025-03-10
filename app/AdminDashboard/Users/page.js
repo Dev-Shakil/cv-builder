@@ -5,7 +5,7 @@ import { MdDeleteForever } from "react-icons/md";
 const OfficeDashboard = async () => {
   // Fetch all offices using the server action
   const offices = await fetchAllOffices();
-
+  console.log(offices)
   return (
     <section className="h-screen bg-gray-100 px-4 text-gray-600 antialiased">
       <div className="flex flex-col">
@@ -59,7 +59,11 @@ const OfficeDashboard = async () => {
                       )}
                     </td>
                     <td className="p-2">{office.office_name}</td>
-                    <td className="p-2">{office.office_number}</td>
+                    <td className="p-2 flex gap-2"> {Array.isArray(office?.office_number)
+    ? office?.office_number.map((number, index) => (
+        <span key={index}>{number}</span>
+      ))
+    : office?.office_number}</td>
                     <td className="p-2">{office.office_address}</td>
                     <td className="p-2">{office.office_email}</td>
                     <td className="p-2">{office.role}</td>

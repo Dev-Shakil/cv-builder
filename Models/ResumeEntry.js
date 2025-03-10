@@ -47,6 +47,27 @@ const resumeSchema = new Schema(
     passport_expire_date: {
       type: String,
     },
+    place_of_birth: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
+    education: {
+      type: String,
+    },
+    phone_number: {
+      type: String,
+    },
+    passport_issue_date: {
+      type: String,
+    },
+    passport_issue_place: {
+      type: String,
+    },
+    phone_number: {
+      type: String,
+    },
     height: {
       type: Number,
       min: 0,
