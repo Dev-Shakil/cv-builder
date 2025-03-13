@@ -5,7 +5,7 @@ import { redirect, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { FaFileDownload } from "react-icons/fa";
-import { updateUserStatus } from "@/lib/actions";
+import { autoUpdateOnholdStatus, updateUserStatus } from "@/lib/actions";
 import Hellow from "./hellow";
 
 function formatDate(dateString) {
@@ -23,6 +23,7 @@ const User_Table = ({ resume }) => {
   const [user, setUser] = useState(null);
   const options = [
     { value: "Pending", label: "Pending" },
+    { value: "Onhold", label: "Onhold" },
     { value: "Approved", label: "Approved" },
     { value: "Rejected", label: "Rejected" },
   ];
@@ -41,6 +42,9 @@ const User_Table = ({ resume }) => {
       setLoading(false); // Hide the loading indicator
     }
   }
+  useEffect(() => {
+    autoUpdateOnholdStatus();
+  }, []);
 
   const columns = [
     {
@@ -130,66 +134,40 @@ const User_Table = ({ resume }) => {
     },
     {
       name: <p className="font-bold text-lg">Status</p>,
-      // selector: (row) => {
-      //   // Check if the resume is approved by the current user's office
-      //   if (row?.approved_office === user?.office_name) {
-      //     if (row?.status === "Approved") {
-      //       // If the status is approved by the same office
-      //       return <p className="text-sm text-green-500">Approved</p>;
-      //     }
-      //   }
-    
-      //   // Check if the resume is approved by a different office
-      //   if (row?.approved_office !== user?.office_name && row?.approved_office) {
-      //     return <p className="text-sm text-gray-500">Not Available</p>;
-      //   }
-    
-      //   // If the resume is not approved by any office (status is "Pending")
-      //   return (
-      //     <div>
-      //       <select
-      //         value={row?.status}
-      //         onChange={(e) => handleStatusUpdate(row._id, e.target.value, user.office_name, setLoading)}
-      //         className="border-2 rounded-md p-2 w-full"
-      //       >
-      //         {options.map((option) => (
-      //           <option key={option.value} value={option.value}>
-      //             {option.label}
-      //           </option>
-      //         ))}
-      //       </select>
-      //       {loading && <p className="text-sm text-gray-500 mt-1">Updating...</p>}
-      //     </div>
-      //   );
-      // },
+      
+      
       selector: (row) => {
-        // Check if the resume is approved by the current user's office
-        if (row?.approved_office?.includes(user?.office_name)) {
-          if (row?.status === "Approved") {
-            // If the status is approved by the same office
-            return <p className="text-sm text-green-500">Approved</p>;
-          }
-        }
-        
-        // If the resume is approved by a different office (not the current user's office)
-        if (row?.approved_office && !row?.approved_office.includes(user?.office_name)) {
-          return <p className="text-sm text-gray-500">Not Available</p>;
-        }
-        
-        // If the resume is not approved by any office (status is "Pending")
+        const isAssignedToCurrentOffice = row?.approved_office?.includes(user?.office_name);
+        const isApprovedByCurrentOffice = row?.status !== "Pending" && row?.approved_office?.includes(user?.office_name);
+        const isPendingAndUnapproved = row?.status === "Pending" && (!row?.approved_office || row?.approved_office.length === 0);
+      
         return (
           <div>
-            <select
-              value={row?.status}
-              onChange={(e) => handleStatusUpdate(row._id, e.target.value, user.office_name, setLoading)}
-              className="border-2 rounded-md p-2 w-full"
-            >
-              {options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            {/* Show the dropdown if it's pending and unapproved, OR if approved by the current office */}
+            {(isPendingAndUnapproved || isApprovedByCurrentOffice) ? (
+              <select
+                value={row?.status}
+                onChange={(e) =>
+                  handleStatusUpdate(row._id, e.target.value, user.office_name, setLoading)
+                }
+                className="border-2 rounded-md p-2 w-full"
+              >
+                {options?.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.value === "Pending" ? "Available" : option.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              // Show the current status if the office is assigned but cannot edit
+              isAssignedToCurrentOffice ? (
+                <p className="text-sm text-gray-600">{row.status}</p>
+              ) : (
+                <p className="text-sm text-gray-500">Not Available</p>
+              )
+            )}
+      
+            {/* Show loading indicator if needed */}
             {loading && <p className="text-sm text-gray-500 mt-1">Updating...</p>}
           </div>
         );
@@ -236,9 +214,9 @@ const User_Table = ({ resume }) => {
   const singleUsersData = resume.filter((pax) => {
     return (
       Array.isArray(pax.office) &&
-      pax.office.includes(user?.office_name) && // Ensure user's office is in the office array
-      (pax.approved_office === user?.office_name || !pax.approved_office) && // Only include if approved_office matches or it's not approved yet
-      !(pax.status === "Approved" && pax.approved_office !== user?.office_name) // Exclude "Approved" items if approved_office doesn't match
+      pax.office.includes(user?.office_name)
+      //  &&
+      // !(pax.status === "Approved" && pax.approved_office && pax.approved_office !== user?.office_name) 
     );
   });
   
@@ -256,25 +234,7 @@ const User_Table = ({ resume }) => {
     setFilter(result);
   }, [search]);
 
-  const extractedData = filter.map((row) => ({
-    Name: row?.name,
-    Passport: row?.passport_no,
-    Gender: row?.gender,
-    Country: row?.country,
-    Medical: row?.medical,
-    Mofa: row?.mofa,
-    "Bio Finger": row?.bio_finger,
-    "Police Clearance": row?.pc_no,
-    "Visa No": row?.visa_no,
-    "ID No": row?.id_no,
-    "Visa Stamping Date": row?.visa_stamping_date,
-    Training: row?.trainging,
-    "BMET Finger": row?.bmet_finger,
-    Manpower: row?.manpower,
-    Delivery: row?.delivery,
-    Payment: row?.payment,
-    Remark: row?.remark,
-  }));
+  
 
   return (
     <>

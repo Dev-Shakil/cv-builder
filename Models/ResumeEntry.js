@@ -94,7 +94,7 @@ const resumeSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ['Pending', 'Approved', 'Rejected'],
+      enum: ['Pending', 'Approved','Onhold', 'Rejected'],
       default: 'Pending',
     },
     approved_office: {

@@ -8,14 +8,16 @@ import { MdDelete, MdEditDocument, MdOutlineLocalPrintshop } from 'react-icons/m
 import { FaFileDownload, FaPrint } from "react-icons/fa";
 import TextInput from './TextInput';
 import Image from 'next/image';
-import { deleteResume } from '@/lib/actions';
+import { autoUpdateOnholdStatus, deleteResume } from '@/lib/actions';
 
 const Admin_Table = ({passenger}) => {
     const router = useRouter()
     const [search, setSearch]= useState('');
     const [users, setUsers] = useState([]);
     const [filter, setFilter]= useState([]);
-    
+    useEffect(() => {
+        autoUpdateOnholdStatus();
+      }, []);
     
     const user =  typeof window !== "undefined" ? JSON.parse(window.localStorage.getItem('user')) : false;
     
@@ -117,8 +119,8 @@ const Admin_Table = ({passenger}) => {
             selector: (row) =>
               row?.picture ? (
                 <Image
-                  src={row.picture}
-                  alt={row.name}
+                  src={row?.picture}
+                  alt={row?.name}
                   width={100}
                   height={100}
                   className="h-16 w-16 rounded object-cover"
@@ -180,13 +182,15 @@ const Admin_Table = ({passenger}) => {
               <p
                   className={`p-1 text-md rounded-lg ${
                       row.status === "Pending"
-                          ? "bg-yellow-500 text-white"
+                          ? "bg-yellow-600 text-white"
                           : row.status === "Approved"
                           ? "bg-green-700 text-white"
+                          : row.status === "Onhold"
+                          ? "bg-pink-700 text-white"
                           : "bg-red-600 text-white"
                   }`}
               >
-                  {row.status}
+                  {row?.status === "Pending" ? "Available": row?.status}
               </p>
           ),
           wrap: true,
