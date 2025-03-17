@@ -48,7 +48,7 @@ const OfficeDashboard = async () => {
                     <td className="p-2">
                       {office.office_logo ? (
                         <Image
-                          src={office.office_logo}
+                          src={office?.office_logo}
                           alt={`${office.office_name} Logo`}
                           width="100"
                           height="60"

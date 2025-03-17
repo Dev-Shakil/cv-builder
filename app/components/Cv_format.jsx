@@ -1,4 +1,5 @@
 "use client";
+import html2canvas from "html2canvas";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
@@ -11,7 +12,20 @@ const Cv_format = ({ resume }) => {
   const [user, setUser] = useState();
   console.log(user);
   const { toPDF, targetRef } = usePDF({filename: `${resume?.name}.pdf`});
-  
+  const componentRef = useRef(null);
+
+  const captureAsJPG = async () => {
+    if (componentRef.current) {
+      const canvas = await html2canvas(componentRef.current, { scale: 2 });
+      const image = canvas.toDataURL("image/jpeg", 1.0); // Convert to JPG
+
+      // Create a link to download the image
+      const link = document.createElement("a");
+      link.href = image;
+      link.download = "component-image.jpg";
+      link.click();
+    }
+  };
   const router = useRouter();
   useEffect(() => {
     // Run only on the client
@@ -57,7 +71,7 @@ const Cv_format = ({ resume }) => {
   return (
     <>
     
-      <div ref={targetRef}
+      <div ref={componentRef}
          className="w-[1000px] p-5 mx-auto">
         <div>
           {user ? (
@@ -428,14 +442,14 @@ const Cv_format = ({ resume }) => {
       <div className="flex justify-center mb-4 w-[1000px] mx-auto">
         {printRef && (
           <div className="flex gap-x-3">
-          <button
+          {/* <button
             className="bg-orange-500 px-6 py-2 rounded-lg text-white text-xl font-medium"
             // onClick={handlePrint}
             onClick={()=>toPDF()}
           >
             Download PDF
-          </button>
-          {/* <button onClick={()=>toPDF()}>Download PDF</button> */}
+          </button> */}
+          <button onClick={captureAsJPG}>Download PDF</button>
          </div>
         )}
       </div>
