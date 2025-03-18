@@ -5,7 +5,6 @@ import React from 'react'
 
 const AddEntry = async () => {
   const offices = await fetchAllOffices();
-  await refreshAdminDashboard();
   console.log(offices)
   return (
     <AddResume offices={offices}/>

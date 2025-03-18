@@ -8,7 +8,6 @@ const EditEntry =async ({params}) => {
 
     const offices = await fetchAllOffices();
     const resume = await fetchSingleResume(id);
-    await refreshAdminDashboard();
     // ✅ Convert MongoDB document to plain object
     const plainResume = JSON.parse(JSON.stringify(resume));
 
