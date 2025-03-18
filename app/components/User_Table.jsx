@@ -5,7 +5,7 @@ import { redirect, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { FaFileDownload } from "react-icons/fa";
-import { autoUpdateOnholdStatus, updateUserStatus } from "@/lib/actions";
+import { autoUpdateOnholdStatus, refreshAdminDashboard, updateUserStatus } from "@/lib/actions";
 import Hellow from "./hellow";
 
 function formatDate(dateString) {
@@ -33,6 +33,7 @@ const User_Table = ({ resume }) => {
     try {
       setLoading(true); // Show a loading indicator if needed
       await updateUserStatus(id, newStatus,office);
+      await refreshAdminDashboard();
       router.refresh();
       alert("Status updated successfully");
     } catch (error) {
@@ -44,6 +45,7 @@ const User_Table = ({ resume }) => {
   }
   useEffect(() => {
     autoUpdateOnholdStatus();
+    refreshAdminDashboard();
   }, []);
 
   const columns = [
