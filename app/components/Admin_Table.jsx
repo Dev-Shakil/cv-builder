@@ -42,7 +42,7 @@ const Admin_Table = ({passenger}) => {
     
         if (response.ok) {
           alert("Successfully deleted the resume entry");
-          router.redirect("/AdminDashboard");  // Refresh the page after successful deletion
+          router.push("/AdminDashboard");  // Refresh the page after successful deletion
         } else {
           throw new Error(response.message || "Failed to delete the resume entry");
         }
