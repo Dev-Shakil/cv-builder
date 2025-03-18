@@ -17,6 +17,7 @@ const Admin_Table = ({passenger}) => {
     const [filter, setFilter]= useState([]);
     useEffect(() => {
         autoUpdateOnholdStatus();
+        refreshAdminDashboard();
       }, []);
     
     const user =  typeof window !== "undefined" ? JSON.parse(window.localStorage.getItem('user')) : false;
