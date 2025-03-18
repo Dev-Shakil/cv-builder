@@ -1,6 +1,6 @@
 
 import EditResume from '@/app/components/EditResume';
-import { fetchAllOffices, fetchSingleResume } from '@/lib/actions';
+import { fetchAllOffices, fetchSingleResume, refreshAdminDashboard } from '@/lib/actions';
 
 
 const EditEntry =async ({params}) => {
@@ -8,7 +8,7 @@ const EditEntry =async ({params}) => {
 
     const offices = await fetchAllOffices();
     const resume = await fetchSingleResume(id);
-
+    await refreshAdminDashboard();
     // ✅ Convert MongoDB document to plain object
     const plainResume = JSON.parse(JSON.stringify(resume));
 

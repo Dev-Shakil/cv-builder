@@ -8,7 +8,7 @@ import { MdDelete, MdEditDocument, MdOutlineLocalPrintshop } from 'react-icons/m
 import { FaFileDownload, FaPrint } from "react-icons/fa";
 import TextInput from './TextInput';
 import Image from 'next/image';
-import { autoUpdateOnholdStatus, deleteResume } from '@/lib/actions';
+import { autoUpdateOnholdStatus, deleteResume, refreshAdminDashboard } from '@/lib/actions';
 
 const Admin_Table = ({passenger}) => {
     const router = useRouter()
@@ -42,7 +42,8 @@ const Admin_Table = ({passenger}) => {
     
         if (response.ok) {
           alert("Successfully deleted the resume entry");
-          router.push("/AdminDashboard");  // Refresh the page after successful deletion
+          router.push("/AdminDashboard");
+          await refreshAdminDashboard()  // Refresh the page after successful deletion
         } else {
           throw new Error(response.message || "Failed to delete the resume entry");
         }

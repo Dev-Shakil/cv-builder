@@ -1,10 +1,11 @@
-import { fetchAllOffices } from "@/lib/actions";
+import { fetchAllOffices, refreshAdminDashboard } from "@/lib/actions";
 import Image from "next/image";
 import { MdDeleteForever } from "react-icons/md";
 
 const OfficeDashboard = async () => {
   // Fetch all offices using the server action
   const offices = await fetchAllOffices();
+  await refreshAdminDashboard();
   console.log(offices)
   return (
     <section className="h-screen bg-gray-100 px-4 text-gray-600 antialiased">

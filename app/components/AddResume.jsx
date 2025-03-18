@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createFormAction } from "@/lib/actions";
+import { createFormAction, refreshAdminDashboard } from "@/lib/actions";
 import { toast } from "@/hooks/use-toast";
 import Select from "react-select";
 
@@ -112,7 +112,7 @@ const AddResume = ({offices}) => {
         experience: "",
         refference: "",
       });
-  
+      await refreshAdminDashboard();
       toast({
         title: "Success",
         description: "Form submitted successfully!",

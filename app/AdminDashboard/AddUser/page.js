@@ -258,6 +258,7 @@ const AddOffice = () => {
       const res = await createOffice(formData);
       if (res.ok) {
         router.push("/AdminDashboard/Users");
+        await refreshAdminDashboard();
         alert("Successfully created a new office");
         router.refresh();
       } else {

@@ -1,6 +1,6 @@
 // "use client"
 // import React, { useLayoutEffect } from "react";
-import { fetchAllResumes } from "@/lib/actions";
+import { fetchAllResumes, refreshAdminDashboard } from "@/lib/actions";
 import Admin_Table from "../components/Admin_Table";
 
 const AdminDashboard = async () => {
@@ -20,7 +20,7 @@ const AdminDashboard = async () => {
   // },[]);
   
   const resume = await fetchAllResumes();
- 
+  await refreshAdminDashboard();
   return (
     <div className="m-4 shadow-lg mx-auto w-full">
       <Admin_Table passenger={resume?.slice().reverse()}/>
