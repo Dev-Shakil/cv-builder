@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { updateOffice } from "@/lib/actions";
+import { useRouter } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
 
 const EditUser = ({ office }) => {
   const router = useRouter();
@@ -52,13 +53,11 @@ const EditUser = ({ office }) => {
     try {
       const res = await updateOffice(office._id, Object.fromEntries(formData.entries()));
 
-      if (res.ok) {
-        alert("Successfully updated the office");
-        router.push("/AdminDashboard/Users");
-        router.refresh();
-      } else {
-        throw new Error("Failed to update office");
-      }
+      toast({
+        title: "Success",
+        description: "Office Edited Successfully!",
+      });
+      router.push("/AdminDashboard/Users")
     } catch (error) {
       console.log(error);
     }
