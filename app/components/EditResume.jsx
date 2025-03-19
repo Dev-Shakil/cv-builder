@@ -113,7 +113,7 @@ const EditResume = ({resume, office,id}) => {
         experience: "",
         refference: "",
       });
-      await refreshAdminDashboard();
+      
       toast({
         title: "Success",
         description: "Form submitted successfully!",

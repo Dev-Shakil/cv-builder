@@ -1,6 +1,7 @@
 import { fetchAllOffices, refreshAdminDashboard } from "@/lib/actions";
 import Image from "next/image";
-import { MdDeleteForever } from "react-icons/md";
+import Link from "next/link";
+import { MdDeleteForever, MdEditDocument } from "react-icons/md";
 
 const OfficeDashboard = async () => {
   // Fetch all offices using the server action
@@ -42,9 +43,9 @@ const OfficeDashboard = async () => {
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-gray-100 text-sm">
+              <tbody className="divide-y divide-gray-100 text-sm ">
                 {offices.map((office) => (
-                  <tr key={office._id}>
+                  <tr key={office._id} className="">
                     <td className="p-2">
                       {office.office_logo ? (
                         <Image
@@ -67,9 +68,12 @@ const OfficeDashboard = async () => {
                     <td className="p-2">{office.office_address}</td>
                     <td className="p-2">{office.office_email}</td>
                     <td className="p-2">{office.role}</td>
-                    <td className="p-2 text-center">
+                    <td className="p-2 text-center flex items-center gap-3 justify-center">
+                      <Link href={`/AdminDashboard/EditUser/${office._id}`} className="text-pink-700 hover:text-green-700">
+                        <MdEditDocument size={24} />
+                      </Link>
                       <button className="text-red-500 hover:text-red-700">
-                        <MdDeleteForever size={20} />
+                        <MdDeleteForever size={24} />
                       </button>
                     </td>
                   </tr>
