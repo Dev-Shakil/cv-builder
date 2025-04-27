@@ -19,7 +19,7 @@ const EditEntry =async ({params}) => {
   
   return (
    
-                <EditResume id={id} office={offices} resume={plainResume} />
+    <EditResume id={id} office={offices} resume={plainResume} />
            
   )
 }

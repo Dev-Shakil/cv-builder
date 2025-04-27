@@ -34,6 +34,10 @@ const resumeSchema = new Schema(
       type: String,
       trim: true,
     },
+    
+    cv_video: {
+      type: String,
+    },
     social_status: {
       type: String,
       trim: true,
@@ -44,6 +48,7 @@ const resumeSchema = new Schema(
     passport_image: {
       type: String, 
     },
+    visas: [String],
     passport_expire_date: {
       type: String,
     },

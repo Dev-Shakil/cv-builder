@@ -1,12 +1,12 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect, useRouter } from "next/navigation";
+import {useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
-import { FaFileDownload } from "react-icons/fa";
 import { autoUpdateOnholdStatus, refreshAdminDashboard, updateUserStatus } from "@/lib/actions";
-import Hellow from "./hellow";
+import { MdPlayCircle } from "react-icons/md";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 function formatDate(dateString) {
   if (!dateString) return "";
@@ -21,14 +21,20 @@ const User_Table = ({ resume }) => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [user, setUser] = useState(null);
+  const [videoUrl, setVideoUrl] = useState("")
+  const [open, setOpen] = useState(false)
   const options = [
     { value: "Pending", label: "Pending" },
     { value: "Onhold", label: "Onhold" },
     { value: "Approved", label: "Approved" },
     { value: "Rejected", label: "Rejected" },
   ];
-  console.log(resume)
+  
   // Helper function to update status with server action
+  const handleVideoClick = (url) => {
+    setVideoUrl(url)
+    setOpen(true)
+  }
   async function handleStatusUpdate(id, newStatus,office, setLoading) {
     try {
       setLoading(true); // Show a loading indicator if needed
@@ -53,17 +59,28 @@ const User_Table = ({ resume }) => {
       name: <p className="font-bold text-lg">Name</p>,
       selector: (row) => (
         <div className="flex flex-col space-y-2">
-          <h3 className="font-medium text-green-600 text-lg uppercase">{row.name}</h3>
-          <p className="font-semibold">Passport: {row.passport_no}</p>
-          <p>Date of Birth: {row.dob}</p>
+          <h3 className="font-semibold text-green-600 text-md uppercase">{row.name}</h3>
+          <p className="font-semibold">{row.passport_no}</p>
+          <p>{row.dob}</p>
         </div>
       ),
       wrap: true,
-      minWidth:"250px"
+      style: { minWidth: "150px", padding:"0px 8px" },
     },
     {
       name: <p className="font-bold text-lg">Position</p>,
       selector: (row) => row.position,
+      wrap: true,
+    },
+    {
+      name: <p className="font-bold text-lg">Video</p>,
+      selector: (row) => {
+        return row?.cv_video && (
+        <MdPlayCircle
+          className="text-2xl text-blue-700 font-bold cursor-pointer"
+          onClick={() => handleVideoClick(row.cv_video)}
+        />
+      )},
       wrap: true,
     },
     {
@@ -175,7 +192,7 @@ const User_Table = ({ resume }) => {
         );
       },
       wrap: true,
-      minWidth: "150px",
+      style: { minWidth: "150px" },
     },
     {
       name: <p className="font-bold text-lg">Entry Date</p>,
@@ -188,7 +205,7 @@ const User_Table = ({ resume }) => {
         <Link className="" href={`/UserDashboard/cv/${row?._id}`}><button className="bg-green-600 px-6 py-2 rounded-lg text-white">Print CV</button></Link>
       ),
       wrap: true,
-      minWidth: "150px",
+      style: { minWidth: "150px" },
     },
   ];
 
@@ -242,6 +259,17 @@ const User_Table = ({ resume }) => {
     <>
       
       <p className="p-5 text-xl font-bold">Total : {singleUsersData.length}</p>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl w-full">
+          <DialogHeader>
+            <DialogTitle>CV Video Preview</DialogTitle>
+          </DialogHeader>
+          <video controls className="w-full rounded-md border">
+            <source src={videoUrl} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </DialogContent>
+      </Dialog>
       <DataTable
         columns={columns}
         data={singleUsersData}

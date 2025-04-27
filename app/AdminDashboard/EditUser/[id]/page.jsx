@@ -12,7 +12,7 @@ const EditUserPage =async ({params}) => {
   
   return (
    
-                <EditUser id={id} office={office}/>
+    <EditUser id={id} office={office}/>
            
   )
 }

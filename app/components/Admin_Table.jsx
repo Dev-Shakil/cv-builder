@@ -4,11 +4,12 @@ import { redirect, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
 import DataTable from 'react-data-table-component';
-import { MdDelete, MdEditDocument, MdOutlineLocalPrintshop } from 'react-icons/md';
+import { MdDelete, MdEditDocument, MdOutlineLocalPrintshop, MdPlayCircle } from 'react-icons/md';
 import { FaFileDownload, FaPrint } from "react-icons/fa";
 import TextInput from './TextInput';
 import Image from 'next/image';
 import { autoUpdateOnholdStatus, deleteResume, refreshAdminDashboard } from '@/lib/actions';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const Admin_Table = ({passenger}) => {
     const router = useRouter()
@@ -19,7 +20,13 @@ const Admin_Table = ({passenger}) => {
         autoUpdateOnholdStatus();
         refreshAdminDashboard();
       }, []);
-    
+      const [videoUrl, setVideoUrl] = useState("")
+      const [open, setOpen] = useState(false)
+      
+      const handleVideoClick = (url) => {
+        setVideoUrl(url)
+        setOpen(true)
+      }
     const user =  typeof window !== "undefined" ? JSON.parse(window.localStorage.getItem('user')) : false;
     
     useEffect(()=>{
@@ -61,9 +68,9 @@ const Admin_Table = ({passenger}) => {
         let year = date.getUTCFullYear();
         return `${day}-${month}-${year}`;
     }
-    const columns = [
+  const columns = [
       {
-          name: <p className="font-bold text-lg">Actions</p>,
+          name: <p className="font-bold text-[16px]">Actions</p>,
           selector: row => (
               <div className="flex items-center gap-2">
                   <Link href={`AdminDashboard/EditEntry/${row._id}`}>
@@ -74,50 +81,57 @@ const Admin_Table = ({passenger}) => {
                       onClick={() => HandleRemove(row._id)}
                   />
                   <Link  href={`AdminDashboard/cv/${row?._id}`}><MdOutlineLocalPrintshop className="text-2xl text-red-800 font-bold cursor-pointer" /></Link>
+                  {row.cv_video && (
+  <MdPlayCircle
+    className="text-2xl text-blue-700 font-bold cursor-pointer"
+    onClick={() => handleVideoClick(row.cv_video)}
+  />
+)}
               </div>
           ),
-          minWidth: "120px",
+          style: { minWidth: "140px", padding:"0px 6px" },
       },
       {
-          name: <p className="font-bold text-lg">Name</p>,
+          name: <p className="font-bold text-[16px]">Name Of Bio</p>,
           selector: row => (
-              <div className="flex flex-col">
+              <div className="flex flex-col space-y-1 p-2">
                   <h3 className="font-bold text-md uppercase">{row.name}</h3>
                   <p className="font-semibold">Passport: {row.passport_no}</p>
-                  <p>Date of Birth: {row.dob}</p>
-                  <p>Nationality: {row.nationality}</p>
+                  <p>{row.dob}</p>
+                  <p>{row.nationality}</p>
               </div>
           ),
-          wrap: true,
-          minWidth: "200px",
+          style: { minWidth: "150px", padding:"0px 3px" },
       },
       {
-          name: <p className="font-bold text-lg">Position</p>,
-          selector: row => row.position,
-          wrap: true,
+          name: <p className="font-bold  text-[16px]">Position</p>,
+          selector: row => (
+            <div >{row?.position}</div>
+          ),
+          wrap:true,
       },
       {
-          name: <p className="font-bold text-lg">Salary</p>,
+          name: <p className="font-bold text-[16px]">Salary</p>,
           selector: row => `$${row.salary}`,
           wrap: true,
       },
       {
-          name: <p className="font-bold text-lg">Contract</p>,
+          name: <p className="font-bold text-[16px]">Contract</p>,
           selector: row => row.contract,
           wrap: true,
       },
       {
-          name: <p className="font-bold text-lg">Religion</p>,
+          name: <p className="font-bold text-[16px]">Religion</p>,
           selector: row => row.religion,
           wrap: true,
       },
+      // {
+      //     name: <p className="font-bold text-[16px]">Social Status</p>,
+      //     selector: row => row.social_status,
+      //     wrap: true,
+      // },
       {
-          name: <p className="font-bold text-lg">Social Status</p>,
-          selector: row => row.social_status,
-          wrap: true,
-      },
-      {
-            name: <p className="font-bold text-lg">Picture</p>,
+            name: <p className="font-bold text-[16px]">Picture</p>,
             selector: (row) =>
               row?.picture ? (
                 <Image
@@ -133,7 +147,7 @@ const Admin_Table = ({passenger}) => {
             wrap: true,
           },
           {
-            name: <p className="font-bold text-lg">Passport Image</p>,
+            name: <p className="font-bold text-[16px]">Passport Image</p>,
             selector: (row) =>
               row?.passport_image ? (
                 <Image
@@ -149,37 +163,18 @@ const Admin_Table = ({passenger}) => {
             wrap: true,
           },
       {
-          name: <p className="font-bold text-lg">Height</p>,
-          selector: row => `${row.height} cm`,
-          wrap: true,
-      },
-      {
-          name: <p className="font-bold text-lg">Weight</p>,
-          selector: row => `${row.weight} kg`,
-          wrap: true,
-      },
-      {
-          name: <p className="font-bold text-lg">Number of Kids</p>,
-          selector: row => row.no_of_kids,
-          wrap: true,
-      },
-      {
-          name: <p className="font-bold text-lg">Experience</p>,
+          name: <p className="font-bold text-[16px]">Experience</p>,
           selector: row => row.experience,
           wrap: true,
       },
+      
       {
-          name: <p className="font-bold text-lg">Reference</p>,
-          selector: row => row.refference,
-          wrap: true,
-      },
-      {
-          name: <p className="font-bold text-lg">Passport Expiry</p>,
+          name: <p className="font-bold text-[16px]">Passport Expiry</p>,
           selector: row => row.passport_expire_date,
           wrap: true,
       },
       {
-          name: <p className="font-bold text-lg">Status</p>,
+          name: <p className="font-bold text-[16px]">Status</p>,
           selector: row => (
               <p
                   className={`p-1 text-md rounded-lg ${
@@ -198,17 +193,17 @@ const Admin_Table = ({passenger}) => {
           wrap: true,
       },
       {
-          name: <p className="font-bold text-lg">Approved By</p>,
+          name: <p className="font-bold text-[16px]">Approved By</p>,
           selector: row => row?.approved_office,
           wrap: true,
       },
       {
-          name: <p className="font-bold text-lg">Entry Date</p>,
+          name: <p className="font-bold text-[16px]">Entry Date</p>,
           selector: row => formatDate(row.createdAt),
           wrap: true,
       },
       {
-        name: <p className="font-bold text-lg">Office</p>,
+        name: <p className="font-bold text-[16px]">Office</p>,
         selector: row => (
             <div className="">
                 {Array.isArray(row?.office)
@@ -216,12 +211,13 @@ const Admin_Table = ({passenger}) => {
                     : row?.office || "No office data"}
             </div>
         ),
-        minWidth: "250px",
+        style: { minWidth: "150px" },
         wrap: true,
     },
       
   ];
-    useEffect(()=>{
+   
+  useEffect(()=>{
         const result= passenger.filter((item)=>{
          return item?.name?.toLowerCase().match(search.toLocaleLowerCase()) || item?.passport_no?.toLowerCase().match(search.toLocaleLowerCase()) || item?.agent?.toLowerCase().match(search.toLocaleLowerCase())
         });
@@ -281,6 +277,17 @@ const Admin_Table = ({passenger}) => {
       </div>
        
     </div> */}
+    <Dialog open={open} onOpenChange={setOpen}>
+  <DialogContent className="max-w-2xl w-full">
+    <DialogHeader>
+      <DialogTitle>CV Video Preview</DialogTitle>
+    </DialogHeader>
+    <video controls className="w-full rounded-md border">
+      <source src={videoUrl} type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </DialogContent>
+</Dialog>
     <DataTable
 
             columns={columns}
